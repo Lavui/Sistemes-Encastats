@@ -17,7 +17,7 @@ uint32_t fs,fclk;
 
 #define K 19.0
 #define N 218
-#define A ((int32_t) round(2*cos(2*M_PI*(K/N))*pow(2,8)))
+#define A (int32_t) round(2*cos(2*M_PI*(K/N))*pow(2,8))
 
 //#define A 1.707535257
 
@@ -93,7 +93,7 @@ int main(void){
       printf("error= %f\n",err);*/
       flag=0;
       PORTD &= ~(1<<PD5);
-      printf("%u\n",XK2);
+      printf("%lu\n",XK2);
     }
     
   }
@@ -107,15 +107,14 @@ ISR(TIMER0_COMPA_vect){
   static int16_t Sn_1=0,Sn_2=0;
   uint8_t Xn=read8_ADC();
   int16_t Sn;
-
   start_ADC();
   n++; //n=0 --> N-1	N--> t=Ts*N =N/Fs
-  Sn=Xn + ((int16_t)(A*Sn_1)>>8) - Sn_2;
+  Sn= Xn + (int16_t)((A*Sn_1)>>8) - Sn_2;
   Sn_2=Sn_1;
   Sn_1=Sn;
   if (n==N-1){
-    Sn_1_copy=Sn_1;
-    Sn_2_copy=Sn_2;
+    Sn_1_copy= Sn_1;
+    Sn_2_copy= Sn_2;
     n=0;
     Sn_1=0;
     Sn_2=0;

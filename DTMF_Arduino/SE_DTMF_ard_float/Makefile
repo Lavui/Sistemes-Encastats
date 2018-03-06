@@ -1,4 +1,4 @@
-PORT = /dev/ttyUSB0
+PORT = /dev/ttyUSB3
 PICOCOM =picocom $(PORT)
 
 
