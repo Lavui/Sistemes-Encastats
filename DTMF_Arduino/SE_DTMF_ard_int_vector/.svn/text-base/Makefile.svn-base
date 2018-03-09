@@ -1,0 +1,12 @@
+.PHONY : loadmain
+loadmain: main.hex
+	avrdude -c arduino -p atmega328p -P /dev/ttyACM0 -U main.hex
+	rm -f *~ *.hex main
+
+main: adc.c pwm_tmr2.c  tmr0.c adc.h pwm_tmr2.h tmr0.h main.c
+	avr-gcc -std=c99 -Os -mmcu=atmega328p -fshort-enums -DF_CPU=16000000UL main.c adc.c pwm_tmr2.c tmr0.c -o main
+
+main.hex: main
+	avr-objcopy -Oihex main main.hex
+
+
