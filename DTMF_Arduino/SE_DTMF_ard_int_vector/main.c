@@ -22,7 +22,7 @@ int32_t A[NUMFREQ];
 			  
 void init_A(void)
 {
-  int i;
+  uint8_t i;
   for(i=0;i<NUMFREQ;i++) A[i]=round(2*cos(2*M_PI*((float)K[i]/N))*pow(2,8));
 }
 /********************************************
@@ -86,7 +86,7 @@ int main(void){
       for (i=0;i<NUMFREQ;i++)
 	{
          XK2[i]=((int32_t)Sn_1_copy[i]*Sn_1_copy[i])+((int32_t)Sn_2_copy[i]*Sn_2_copy[i])-((A[i]*Sn_1_copy[i])>>8)*Sn_2_copy[i];
-	 printf("%7lu ",XK2[i]);
+	 printf("%10lu ",XK2[i]);
 	}
       printf("\n");
       flag=0;
@@ -101,10 +101,10 @@ int main(void){
 
 ISR(TIMER0_COMPA_vect){
   PORTD |= (1<<PD4);
-  static int16_t Sn_1[NUMFREQ]={0,0,0,0,0,0,0,0},Sn_2[NUMFREQ]={0,0,0,0,0,0,0,0};
+  static int16_t Sn_1[NUMFREQ]={0,0,0,0,0,0,0,0}, Sn_2[NUMFREQ]={0,0,0,0,0,0,0,0};
   uint8_t i;
-  uint8_t Xn=read8_ADC();
   int16_t Sn[NUMFREQ];
+  uint8_t Xn=read8_ADC();
   start_ADC();
   for(i=0;i<NUMFREQ;i++)
     {
@@ -113,7 +113,7 @@ ISR(TIMER0_COMPA_vect){
       Sn_1[i]=Sn[i];
     }  
   n++; //n=0 --> N-1	N--> t=Ts*N =N/Fs
-  if (n==N-1){
+  if (n==N){
     for(i=0;i<NUMFREQ;i++)
       {
        Sn_1_copy[i]= Sn_1[i];
