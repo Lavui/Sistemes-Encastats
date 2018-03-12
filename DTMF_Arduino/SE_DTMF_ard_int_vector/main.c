@@ -14,35 +14,26 @@ uint32_t fs,fclk;
 
 //uint8_t n=0;
 
+
 #define N 206
+#define FM 8000
 #define NUMFREQ 8 // seran les freqüències de 0 a 7
 //#define A 1.707535257
-const int8_t K[NUMFREQ]={18,20,22,24,31,34,38,42};
+const uint16_t FS[NUMFREQ]={697,770,852,941,1209,1336,1477,1633};
+uint8_t K[NUMFREQ];
 int32_t A[NUMFREQ];
 			  
-void init_A(void)
+void init_A_FS(void)
 {
   uint8_t i;
-  for(i=0;i<NUMFREQ;i++) A[i]=round(2*cos(2*M_PI*((float)K[i]/N))*pow(2,8));
+  for(i=0;i<NUMFREQ;i++){
+    K[i]=round((float)FS[i]*N/FM);
+    A[i]=round(2*cos(2*M_PI*((float)K[i]/N))*pow(2,8));
+    
+  }
 }
-/********************************************
-                Clock measurement
---------------------------------------------	-
-This program takes samples from the analog
-input A5 of the Ardiuno UNO Board.
-The conversion time is 13/fadc_clk, fadc_clk=16e6/adc_pre.
 
-With the 8 most significant bits
-it updates the PWM output at terminal ~3 or ~11.
 
-An interrupt is activated each 50us (ocr0a=99, tmr0_pre=8)
-
-The digital output PD4 is set to '1'
-at the beginning of the ISR
-and to '0' at the end.
-
-26 September 2014
-*********************************************/
 static int uart_putchar(char c, FILE *stream);
 static FILE mystdout = FDEV_SETUP_STREAM(uart_putchar, NULL,_FDEV_SETUP_WRITE);
 static int uart_putchar(char c, FILE *stream){
@@ -73,7 +64,7 @@ void setup(){
 static int16_t Sn_1_copy[NUMFREQ]={0,0,0,0,0,0,0,0},Sn_2_copy[NUMFREQ]={0,0,0,0,0,0,0,0};
 
 int main(void){
-  init_A();
+  init_A_FS();
   setup();
   printf("%d\n",A[0]);
   printf("main");
