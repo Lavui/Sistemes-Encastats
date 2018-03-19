@@ -6,22 +6,27 @@
 #include <stdio.h>
 
 #include "pwm_tmr2.h"
-volatile uint8_t estat=1;
+
 //volatile uint32_t n;
 volatile int flag=0;
 volatile double f0,err;
 uint32_t fs,fclk;
 
 //uint8_t n=0;
+char calc_boto(void);
+void capa_3(char capa_2);
 
-
-#define N 206
+#define N 197
 #define FM 8000
 #define NUMFREQ 8 // seran les freqüències de 0 a 7
 //#define A 1.707535257
 const uint16_t FS[NUMFREQ]={697,770,852,941,1209,1336,1477,1633};
 uint8_t K[NUMFREQ];
 int32_t A[NUMFREQ];
+
+const uint32_t LLINDAR[NUMFREQ]={44694,41703,48811,30602,40294,38436,9945,11383};
+
+const char dial_pad[4][4]={{'1','2','3','A'},{'4','5','6','B'},{'7','8','9','C'},{'*','0','#','D'}};
 			  
 void init_A_FS(void)
 {
@@ -61,25 +66,30 @@ void setup(){
   sei();
 }
 
-static int16_t Sn_1_copy[NUMFREQ]={0,0,0,0,0,0,0,0},Sn_2_copy[NUMFREQ]={0,0,0,0,0,0,0,0};
+int16_t Sn_1_copy[NUMFREQ]={0,0,0,0,0,0,0,0},Sn_2_copy[NUMFREQ]={0,0,0,0,0,0,0,0};
+uint32_t XK2[NUMFREQ];
 
 int main(void){
+  char rebut;
   init_A_FS();
   setup();
-  printf("%d\n",A[0]);
-  printf("main");
+  printf("main\n");
   while(1){
     // ---------CALC----------
     if (flag==1){
       PORTD |= (1<<PD5);
-      uint32_t XK2[NUMFREQ];
       uint8_t i;
       for (i=0;i<NUMFREQ;i++)
 	{
          XK2[i]=((int32_t)Sn_1_copy[i]*Sn_1_copy[i])+((int32_t)Sn_2_copy[i]*Sn_2_copy[i])-((A[i]*Sn_1_copy[i])>>8)*Sn_2_copy[i];
-	 printf("%10lu ",XK2[i]);
+	 //printf("%10lu ",XK2[i]);
 	}
-      printf("\n");
+      //rebut=calc_boto();
+      //printf("%c",rebut);
+      //if (rebut!='S') printf("\n");
+      //capa_3(rebut);
+      capa_3(calc_boto());
+
       flag=0;
       PORTD &= ~(1<<PD5);
     }
@@ -120,3 +130,78 @@ ISR(TIMER0_COMPA_vect){
   PORTD &= ~(1<<PD4);
 }
 
+
+char calc_boto(void){
+  int count=0, low=-1, high=-1;
+  int salt=0;
+  for (int i=0; i<4; i++){
+    if (LLINDAR[i]<XK2[i]){
+       count++;low=i; //printf("%10u",FS[i]); salt=-1;
+    }
+  }
+  if (count>1) low=-2;
+  count=0;
+  for (int i=0; i<4; i++){
+    if (LLINDAR[i+4]<XK2[i+4]){
+       count++; high=i; //printf("%10u",FS[i]); salt=-1;
+    }
+  }
+  if (count>1) high=-2;
+  count=0;
+
+  //if (salt) printf("\n");
+    
+  if((low==-1)&&(high==-1)) return 'S';
+  if((low==-1)||(high==-1)) return 'E';
+  if((low==-2)||(high==-2)) return 'E';
+  return dial_pad[low][high];
+}
+
+
+
+static int estat=0;
+
+void capa_3(char capa_2){
+
+  //printf("%c",capa_2);
+  switch (estat){
+    case 0:
+      if (!((capa_2=='S') || (capa_2=='E'))) {
+        printf("%c",capa_2); estat=1;
+      }
+      else{printf("-");}
+      break;
+
+    case 1:
+      if (capa_2=='S') {
+        estat=0;
+      }
+      //else printf("%d",estat);
+      break;
+     default:
+       printf("%d",estat);
+  }
+}
+
+
+
+/*
+void calc_boto(void){
+  //Sortida d'aquesta capa 2: 'char' 'silenci' '?'
+  uint32_t sumL3=0, maxL4=0, mitL3, llinL, sumH3=0, maxH4=0, mitH3, llinH;
+  for (int i=0; i<4 ; i++){
+    sumL3 += XK2[i];
+    sumH3 += XK2[i+4];
+    if (maxL4<XK2[i]) maxL4=XK2[i];
+    if (maxH4<XK2[i+4]) maxH4=XK2[i+4];
+  }
+  sumL3-=maxL4; // sumL3 té la suma dels 3 valors menors; maxL4 té el valor màxim dels L
+  sumH3-=maxH4; 
+  mitL3=sumL3/3;
+  mitH3=sumH3/3;
+  llinL = mitL3+(0.9*(maxL4-mitL3));
+  llinH = mitH3+(0.8*(maxH4-mitH3));
+  if (maxL4>llinL) printf("%8lu %8lu %8.0f%%",llinL, maxL4, round(100.0*maxL4/llinL));
+  if (maxH4>llinH) printf("%8lu %8lu %8.0f%%",llinH, maxH4, round(100.0*maxH4/llinH));
+}
+*/
