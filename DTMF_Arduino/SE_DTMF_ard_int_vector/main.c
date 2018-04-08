@@ -22,7 +22,8 @@ void capa_3(char capa_2);
 //#define A 1.707535257
 
 const uint16_t FS[NUMFREQ]={697,770,852,941,1209,1336,1477,1633};
-const uint32_t LLINDAR[NUMFREQ]={44694,41703,48811,30602,40294,38436,9945,11383};
+//const uint32_t LLINDAR[NUMFREQ]={44694,41703,48811,30602,40294,38436,9945,11383}; //primers llindars basats en calcul mitjanes i maxims
+const uint32_t LLINDAR[NUMFREQ]={65112,72015,68495,61135,61812,48062,69813,48067}; //maxim dels falsos mes un 10%
 const char dial_pad[4][4]={{'1','2','3','A'},{'4','5','6','B'},{'7','8','9','C'},{'*','0','#','D'}};
 
 uint8_t K[NUMFREQ];
