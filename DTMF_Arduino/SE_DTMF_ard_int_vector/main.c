@@ -50,12 +50,7 @@ static int uart_putchar(char c, FILE *stream){
 
 void setup(){
   setup_ADC(1,5,16);//(adc_input,v_ref,adc_pre)
-  //adc_input 0-5 (default=5),8 Tª, 14 1.1V, 15 GND 
-  //v_ref 0 (AREF), 1(1.1V), default=5 (5V)
-  //adc_pre 2,4,8,16(default),32,64,128
   setup_tmr0(250,8);//(ocr0a, tmr0_pre)
-  //tmr0_pre 1,default=8,64,256,1024
-  //TMR0=prescaler*(ocr0a+1)*T_clk
   setup_pwm_tmr2(11);//(pwm_out) 3,default=11
   DDRD |=(1<<4);//pin 4 Arduino as an output. It shows sampling period (period) and ISR execution time (pulse wide)
   DDRD |=(1<<5);//pin  Arduino as an output. It shows sampling period (period) and ISR execution time (pulse wide)
@@ -91,9 +86,8 @@ int main(void){
   }
 }
 
-int8_t i,count;//les posem globals ja que si no, passen coses rares (capa_3 no va bé si no es fa algun printf a algun lloc del
-//codi!
-const char calc_boto(void){
+int8_t i,count;/*les posem globals ja que si no, passen coses rares (capa_3 no va bé si no es fa algun printf a algun lloc del codi!*/
+const char calc_boto(void){ //CAPA 2: detecció de les 2 freqüències + botó corresponent
   int8_t low=-1, high=-1;
   for (count=0, i=0; i<4; i++){ //mirem freq. baixes
     if (LLINDAR[i]<XK2[i]){
@@ -115,7 +109,7 @@ const char calc_boto(void){
   return dial_pad[low][high]; // low i high tenen les posicions freq. detectades: key
 }
 
-void capa_3(char capa_2){
+void capa_3(char capa_2){ //CAPA 3: màquina d'estats. Filtre casos d'error, espais, durada de pulsació de boto...
   static uint8_t estat=0;
   switch (estat){
     case 0:
@@ -136,27 +130,6 @@ void capa_3(char capa_2){
        printf("%d",estat);
   }
 }
-
-/*
-void calc_boto(void){
-  //Sortida d'aquesta capa 2: 'char' 'silenci' '?'
-  uint32_t sumL3=0, maxL4=0, mitL3, llinL, sumH3=0, maxH4=0, mitH3, llinH;
-  for (int i=0; i<4 ; i++){
-    sumL3 += XK2[i];
-    sumH3 += XK2[i+4];
-    if (maxL4<XK2[i]) maxL4=XK2[i];
-    if (maxH4<XK2[i+4]) maxH4=XK2[i+4];
-  }
-  sumL3-=maxL4; // sumL3 té la suma dels 3 valors menors; maxL4 té el valor màxim dels L
-  sumH3-=maxH4; 
-  mitL3=sumL3/3;
-  mitH3=sumH3/3;
-  llinL = mitL3+(0.9*(maxL4-mitL3));
-  llinH = mitH3+(0.8*(maxH4-mitH3));
-  if (maxL4>llinL) printf("%8lu %8lu %8.0f%%",llinL, maxL4, round(100.0*maxL4/llinL));
-  if (maxH4>llinH) printf("%8lu %8lu %8.0f%%",llinH, maxH4, round(100.0*maxH4/llinH));
-}
-*/
 
 
 static uint8_t n=0;
