@@ -17,7 +17,7 @@ uint32_t fs,fclk;
 //void capa_3(char capa_2);
 
 #define N 197
-#define FM 8000
+#define FM 8000 // freqüència de mostratge
 #define NUMFREQ 8 // seran les freqüències de 0 a 7
 //#define A 1.707535257
 
@@ -48,7 +48,7 @@ static int uart_putchar(char c, FILE *stream){
 
 
 void setup(){
-  setup_ADC(1,5,16);//(adc_input,v_ref,adc_pre)
+  setup_ADC(1,5,16); //(adc_input,v_ref,adc_pre)
   //adc_input 0-5 (default=5),8 Tª, 14 1.1V, 15 GND 
   //v_ref 0 (AREF), 1(1.1V), default=5 (5V)
   //adc_pre 2,4,8,16(default),32,64,128
