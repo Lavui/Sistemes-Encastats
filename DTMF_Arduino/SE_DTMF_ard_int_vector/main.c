@@ -52,8 +52,8 @@ void setup(){
   setup_ADC(1,5,16);//(adc_input,v_ref,adc_pre)
   setup_tmr0(250,8);//(ocr0a, tmr0_pre)
   setup_pwm_tmr2(11);//(pwm_out) 3,default=11
-  DDRD |=(1<<4);//pin 4 Arduino as an output. It shows sampling period (period) and ISR execution time (pulse wide)
-  DDRD |=(1<<5);//pin  Arduino as an output. It shows sampling period (period) and ISR execution time (pulse wide)
+  DDRD |=(1<<4);//pin 4 of Arduino as an output. It shows sampling period (period) and ISR execution time (pulse wide)
+  DDRD |=(1<<5);//pin 5 of Arduino as an output. It shows sampling period (period) and ISR execution time (pulse wide)
   serial_init();  
   stdout = &mystdout;
   sei();
