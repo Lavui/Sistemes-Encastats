@@ -16,7 +16,7 @@ uint32_t fs,fclk;
 const char calc_boto(void);
 void capa_3(char capa_2);
 
-#define N 197
+#define N 197 // Valor resultant de la cerca de l'òptim
 #define FM 8000
 #define NUMFREQ 8 // seran les freqüències de 0 a 7
 //#define A 1.707535257
