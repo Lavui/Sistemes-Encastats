@@ -22,8 +22,8 @@ void capa_3(char capa_2);
 //#define A 1.707535257
 
 const uint16_t FS[NUMFREQ]={697,770,852,941,1209,1336,1477,1633};
-//const uint32_t LLINDAR[NUMFREQ]={44694,41703,48811,30602,40294,38436,9945,11383}; //primers llindars basats en calcul mitjanes i maxims
-const uint32_t LLINDAR[NUMFREQ]={65112,72015,68495,61135,61812,48062,69813,48067}; //maxim dels falsos mes un 10%
+//const uint32_t LLINDAR[NUMFREQ]={44694,41703,48811,30602,40294,38436,9945,11383}; // primers llindars basats en calcul mitjanes i maxims
+const uint32_t LLINDAR[NUMFREQ]={65112,72015,68495,61135,61812,48062,69813,48067}; // maxim dels falsos mes un 10%
 const char dial_pad[4][4]={{'1','2','3','A'},{'4','5','6','B'},{'7','8','9','C'},{'*','0','#','D'}};
 
 uint8_t K[NUMFREQ];
@@ -49,9 +49,9 @@ static int uart_putchar(char c, FILE *stream){
 
 
 void setup(){
-  setup_ADC(1,5,16);//(adc_input,v_ref,adc_pre)
-  setup_tmr0(250,8);//(ocr0a, tmr0_pre)
-  setup_pwm_tmr2(11);//(pwm_out) 3,default=11
+  setup_ADC(1,5,16);// (adc_input,v_ref,adc_pre)
+  setup_tmr0(250,8);// (ocr0a, tmr0_pre)
+  setup_pwm_tmr2(11);// (pwm_out) 3,default=11
   DDRD |=(1<<4);//pin 4 of Arduino as an output. It shows sampling period (period) and ISR execution time (pulse wide)
   DDRD |=(1<<5);//pin 5 of Arduino as an output. It shows sampling period (period) and ISR execution time (pulse wide)
   serial_init();  
@@ -87,29 +87,29 @@ int main(void){
 }
 
 int8_t i,count;/*les posem globals ja que si no, passen coses rares (capa_3 no va bé si no es fa algun printf a algun lloc del codi!*/
-const char calc_boto(void){ //CAPA 2: detecció de les 2 freqüències + botó corresponent
+const char calc_boto(void){ // CAPA 2: detecció de les 2 freqüències + botó corresponent
   int8_t low=-1, high=-1;
-  for (count=0, i=0; i<4; i++){ //mirem freq. baixes
+  for (count=0, i=0; i<4; i++){ // mirem freq. baixes
     if (LLINDAR[i]<XK2[i]){
        count++;
-       if (count>1) return 'E'; //mes de 2 freq. detectades: error
+       if (count>1) return 'E'; // mes de 2 freq. detectades: error
        low=i;
     }
   } 
-  for (count=0, i=0; i<4; i++){ //mirem freq. altes
+  for (count=0, i=0; i<4; i++){ // mirem freq. altes
     if (LLINDAR[i+4]<XK2[i+4]){
        count++;
-       if (count>1) return 'E'; //mes de 2 freq. detectades: error
+       if (count>1) return 'E'; // mes de 2 freq. detectades: error
        high=i;
     }
   }
-  if((low==-1)&&(high==-1)) return 'S'; //cap freq. detectada: space
-  if((low==-1)||(high==-1)) return 'E'; //detectada 1 freq. sola: error
+  if((low==-1)&&(high==-1)) return 'S'; // cap freq. detectada: space
+  if((low==-1)||(high==-1)) return 'E'; // detectada 1 freq. sola: error
   //printf("%c",dial_pad[low][high]);
   return dial_pad[low][high]; // low i high tenen les posicions freq. detectades: key
 }
 
-void capa_3(char capa_2){ //CAPA 3: màquina d'estats. Filtre casos d'error, espais, durada de pulsació de boto...
+void capa_3(char capa_2){ // CAPA 3: màquina d'estats. Filtre casos d'error, espais, durada de pulsació de boto...
   static uint8_t estat=0;
   switch (estat){
     case 0:
